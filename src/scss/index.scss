@@ -1,0 +1,51 @@
+@import 'fonts';
+@import 'defaults';
+
+.container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+
+  &:after {
+    content: '';
+    display: table;
+    clear: both;
+  }
+
+  @media (min-width: 400px) {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  @media (min-width: 600px) {
+    padding-left: 8.1%;
+    padding-right: 8.1%;
+  }
+
+  @media (min-width: 800px) {
+    padding-left: 16.4%;
+    padding-right: 16.4%;
+  }
+}
+
+.title {
+  text-align: center;
+}
+
+.video-container {
+  position: relative;
+  max-width: 640px;
+  margin: auto;
+}
+
+.canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.mask {
+  display: none;
+}
