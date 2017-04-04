@@ -59,11 +59,7 @@ const config = {
     path: path.resolve(__dirname, 'build'),
   },
   plugins: [
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        warnings: false
-      }
-    }),
+    new webpack.optimize.UglifyJsPlugin(),
     new webpack.optimize.OccurrenceOrderPlugin(),
     new ExtractTextPlugin({
       filename: (getPath) => {
