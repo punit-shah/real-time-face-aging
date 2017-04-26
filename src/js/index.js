@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import clm from './lib/clmtrackr/clmtrackr';
 import pModel from './lib/clmtrackr/models/model_pca_20_svm';
 import FaceDeformer from './lib/clmtrackr/js/face_deformer';
@@ -6,45 +5,46 @@ import FaceDeformer from './lib/clmtrackr/js/face_deformer';
 const tracker = new clm.tracker();
 tracker.init(pModel);
 
-const $video = $('#video');
+const video = document.getElementById('video');
 
-$video.on('canplay', (e) => {
+video.addEventListener('canplay', (e) => {
   startVideo(e.target);
 });
 
-const $gridCanvas = $('#grid');
-const gridContext = $gridCanvas[0].getContext('2d');
+const gridCanvas = document.getElementById('grid');
+const gridContext = gridCanvas.getContext('2d');
 
-const $maskCanvas = $('#mask');
+const maskCanvas = document.getElementById('mask');
 
-const $videoframeCanvas = $('<canvas/>').attr('id', 'videoframe');
-const videoframeContext = $videoframeCanvas[0].getContext('2d');
+const videoframeCanvas = document.createElement('canvas');
+videoframeCanvas.id = 'videoframe';
+const videoframeContext = videoframeCanvas.getContext('2d');
 
-function setDimensionAttributes($element, width, height) {
-  $element.attr('width', width);
-  $element.attr('height', height);
+function setDimensions(element, width, height) {
+  element.width = width;
+  element.height = height;
 }
 
 function setVideoSize() {
-  const width = $video.parent().width();
+  const width = video.parentElement.offsetWidth;
   const height = width / 4 * 3;
-  setDimensionAttributes($video, width, height);
-  setDimensionAttributes($gridCanvas, width, height);
-  setDimensionAttributes($maskCanvas, width, height);
-  setDimensionAttributes($videoframeCanvas, width, height);
+  setDimensions(video, width, height);
+  setDimensions(gridCanvas, width, height);
+  setDimensions(maskCanvas, width, height);
+  setDimensions(videoframeCanvas, width, height);
 }
 
-setVideoSize();
-$(window).resize(setVideoSize);
+window.onresize = setVideoSize;
+window.onresize();
 
 const fd = new FaceDeformer();
-fd.init($maskCanvas[0]);
+fd.init(maskCanvas);
 
 navigator.mediaDevices.getUserMedia({
   audio: false,
   video: true,
 }).then((mediaStream) => {
-  $video[0].srcObject = mediaStream;
+  video.srcObject = mediaStream;
 });
 
 function startVideo(video) {
@@ -54,12 +54,12 @@ function startVideo(video) {
 }
 
 function clearGrid() {
-  gridContext.clearRect(0, 0, $gridCanvas[0].width, $gridCanvas[0].height);
+  gridContext.clearRect(0, 0, gridCanvas.width, gridCanvas.height);
 }
 
 function drawModel() {
   clearGrid();
-  tracker.draw($gridCanvas[0], tracker.getCurrentParameters(), 'vertices');
+  tracker.draw(gridCanvas, tracker.getCurrentParameters(), 'vertices');
 
   const convergence = tracker.getConvergence();
   if (convergence < 0.4) {
@@ -71,11 +71,11 @@ function drawModel() {
 }
 
 function drawMask() {
-  videoframeContext.drawImage($video[0], 0, 0, $videoframeCanvas[0].width, $videoframeCanvas[0].height);
+  videoframeContext.drawImage(video, 0, 0, videoframeCanvas.width, videoframeCanvas.height);
 
   var positions = tracker.getCurrentPosition();
   if (positions) {
-    fd.load($videoframeCanvas[0], positions, pModel);
+    fd.load(videoframeCanvas, positions, pModel);
     fd.draw(positions);
   }
 

@@ -649,7 +649,7 @@ var clm = {
 
 			var cc = canvas.getContext('2d');
 			cc.fillStyle = "rgb(200,200,200)";
-			cc.strokeStyle = "rgb(130,255,50)";
+			cc.strokeStyle = "rgb(255,255,255)";
 			//cc.lineWidth = 1;
 
 			var paths;
