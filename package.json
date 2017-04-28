@@ -20,7 +20,7 @@
     "webpack-dev-server": "^2.4.2"
   },
   "scripts": {
-    "start": "webpack-dev-server --content-base build/",
+    "start": "webpack-dev-server",
     "lint": "eslint src/js/*.js",
     "build": "webpack",
     "watch": "webpack --watch",

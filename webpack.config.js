@@ -9,9 +9,11 @@ const babelConfig = JSON.parse(fs.readFileSync('.babelrc'));
 
 const config = {
   context: path.resolve(__dirname, 'src'),
+
   entry: {
     'js/index': [],
   },
+
   module: {
     rules: [
       {
@@ -29,7 +31,7 @@ const config = {
         enforce: 'pre',
       },
       {
-        test: /\.js/,
+        test: /\.js$/,
         exclude: path.resolve(__dirname, 'node_modules'),
         use: {
           loader: 'babel-loader',
@@ -37,7 +39,7 @@ const config = {
         },
       },
       {
-        test: /.scss/,
+        test: /.scss$/,
         use: ExtractTextPlugin.extract({
           use: [
             {
@@ -54,23 +56,34 @@ const config = {
       },
     ],
   },
+
   output: {
     filename: '[name].js',
     path: path.resolve(__dirname, 'build'),
   },
+
   plugins: [
+    new webpack.LoaderOptionsPlugin({
+      minimize: true,
+      debug: false
+    }),
     new webpack.optimize.UglifyJsPlugin(),
     new webpack.optimize.OccurrenceOrderPlugin(),
+    new webpack.HotModuleReplacementPlugin(),
     new ExtractTextPlugin({
-      filename: (getPath) => {
-        return getPath('css/[name].css').replace('css/js', 'css');
-      },
+      filename: (getPath) => getPath('css/[name].css').replace('css/js', 'css'),
     }),
     new CopyWebpackPlugin([
       {from: '*.html'},
       {from: 'img/*'},
     ])
   ],
+
+  devServer: {
+    contentBase: path.resolve(__dirname, 'build'),
+    compress: true,
+    hot: true,
+  }
 };
 
 fs.readdirSync('src/js').map((file) => {
