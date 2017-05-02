@@ -11,7 +11,7 @@ const config = {
   context: path.resolve(__dirname, 'src'),
 
   entry: {
-    'js/index': [],
+    'js/index': ['./js/index'],
   },
 
   module: {
@@ -85,13 +85,6 @@ const config = {
     hot: true,
   }
 };
-
-fs.readdirSync('src/js').map((file) => {
-  if (file.endsWith('.js')) {
-    const name = file.slice(0, -3);
-    config.entry['js/index'].push(`./js/${name}`);
-  }
-});
 
 fs.readdirSync('src/scss').map((file) => {
   if (file.endsWith('.scss') && !file.startsWith('_')) {
