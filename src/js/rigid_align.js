@@ -92,3 +92,5 @@ function rotatePoints(pointSet, a) {
   });
   return rotatedPoints;
 }
+
+export default rigidAlign;
