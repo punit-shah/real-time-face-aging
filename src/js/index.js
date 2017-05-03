@@ -1,6 +1,6 @@
 import clm from './lib/clmtrackr/clmtrackr';
 import pModel from './lib/clmtrackr/models/model_pca_20_svm';
-import FaceDeformer from './lib/clmtrackr/js/face_deformer';
+import FaceDeformer from './face_deformer';
 
 const tracker = new clm.tracker();
 tracker.init(pModel);
@@ -37,8 +37,7 @@ function setVideoSize() {
 window.onresize = setVideoSize;
 window.onresize();
 
-const fd = new FaceDeformer();
-fd.init(maskCanvas);
+const fd = new FaceDeformer(maskCanvas);
 
 navigator.mediaDevices.getUserMedia({
   audio: false,
