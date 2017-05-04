@@ -1,4 +1,4 @@
-class FaceDeformer {
+class FaceAger {
   constructor(webglCanvas) {
     this.gl = window.getWebGLContext(webglCanvas);
     this.shaderProgram = createShaderProgram(this.gl);
@@ -8,7 +8,6 @@ class FaceDeformer {
   load(textureCanvas, points, pModel) {
     this.pModel = pModel;
     this.vertices = this.pModel.path.vertices;
-    this.numTriangles = this.vertices.length;
     this.dimensions = findDimensions(points, textureCanvas.width, textureCanvas.height);
     this.points = correctPoints(points, this.dimensions.minX, this.dimensions.minY);
     this.textureVertices = createTextureVertices(this.vertices, this.points,
@@ -175,4 +174,4 @@ function createTexture(gl, image) {
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
 }
 
-export default FaceDeformer;
+export default FaceAger;

@@ -1,6 +1,6 @@
 import clm from './lib/clmtrackr/clmtrackr';
 import pModel from './lib/clmtrackr/models/model_pca_20_svm';
-import FaceDeformer from './face_deformer';
+import FaceAger from './face_ager';
 
 const tracker = new clm.tracker();
 tracker.init(pModel);
@@ -37,7 +37,7 @@ function setVideoSize() {
 window.onresize = setVideoSize;
 window.onresize();
 
-const fd = new FaceDeformer(maskCanvas);
+const faceAger = new FaceAger(maskCanvas);
 
 navigator.mediaDevices.getUserMedia({
   audio: false,
@@ -74,8 +74,8 @@ function drawMask() {
 
   var positions = tracker.getCurrentPosition();
   if (positions) {
-    fd.load(videoframeCanvas, positions, pModel);
-    fd.draw(positions);
+    faceAger.load(videoframeCanvas, positions, pModel);
+    faceAger.draw(positions);
   }
 
   requestAnimationFrame(drawMask);
