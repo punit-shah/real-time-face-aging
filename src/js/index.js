@@ -1,6 +1,8 @@
 import clm from './lib/clmtrackr/clmtrackr';
 import pModel from './lib/clmtrackr/models/model_pca_20_svm';
 import FaceAger from './face_ager';
+import mw13_18_points from './average_points/mw13-18';
+import mw55_points from './average_points/mw55';
 
 const tracker = new clm.tracker();
 tracker.init(pModel);
@@ -72,10 +74,10 @@ function drawModel() {
 function drawMask() {
   videoframeContext.drawImage(video, 0, 0, videoframeCanvas.width, videoframeCanvas.height);
 
-  var positions = tracker.getCurrentPosition();
-  if (positions) {
-    faceAger.load(videoframeCanvas, positions, pModel);
-    faceAger.draw(positions);
+  var subjectPositions = tracker.getCurrentPosition();
+  if (subjectPositions) {
+    faceAger.load(videoframeCanvas, subjectPositions, pModel);
+    faceAger.draw(subjectPositions, mw13_18_points, mw55_points);
   }
 
   requestAnimationFrame(drawMask);

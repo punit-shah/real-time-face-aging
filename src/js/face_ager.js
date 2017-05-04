@@ -1,3 +1,5 @@
+import rigidAlign from './rigid_align';
+
 class FaceAger {
   constructor(webglCanvas) {
     this.gl = window.getWebGLContext(webglCanvas);
@@ -5,12 +7,12 @@ class FaceAger {
     this.texCoordBuffer = this.gl.createBuffer();
   }
 
-  load(textureCanvas, points, pModel) {
+  load(textureCanvas, subjectPoints, pModel) {
     this.pModel = pModel;
     this.vertices = this.pModel.path.vertices;
-    this.dimensions = findDimensions(points, textureCanvas.width, textureCanvas.height);
-    this.points = correctPoints(points, this.dimensions.minX, this.dimensions.minY);
-    this.textureVertices = createTextureVertices(this.vertices, this.points,
+    this.dimensions = findDimensions(subjectPoints, textureCanvas.width, textureCanvas.height);
+    this.subjectPoints = correctPoints(subjectPoints, this.dimensions.minX, this.dimensions.minY);
+    this.textureVertices = createTextureVertices(this.vertices, this.subjectPoints,
       this.dimensions.width, this.dimensions.height);
 
     // put texture coordinates in buffer
@@ -22,7 +24,7 @@ class FaceAger {
     this.gl.useProgram(this.shaderProgram);
 
     // look up location of texture coordinate attribute
-    this.texCoordLocation = this.gl.getAttribLocation(this.shaderProgram, 'a_texCoord');
+    this.texCoordLocation = this.gl.getAttribLocation(this.shaderProgram, 'a_subjectTexCoord');
     // pull data from buffer into attribute
     this.gl.enableVertexAttribArray(this.texCoordLocation);
     this.gl.vertexAttribPointer(this.texCoordLocation, 2, this.gl.FLOAT, false, 0, 0);
@@ -39,17 +41,16 @@ class FaceAger {
       this.gl.drawingBufferHeight);
   }
 
-  draw(points) {
-    const positionVertices = createPositionVertices(this.vertices, points);
+  draw(subjectPoints, currentAvgPoints, targetAvgPoints) {
+    const alignedCurrentAvgPoints = rigidAlign(currentAvgPoints, subjectPoints);
+    const alignedTargetAvgPoints = rigidAlign(targetAvgPoints, subjectPoints);
 
-    const positionBuffer = this.gl.createBuffer();
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, positionBuffer);
-    this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(positionVertices),
-      this.gl.STATIC_DRAW);
-
-    const positionLocation = this.gl.getAttribLocation(this.shaderProgram, 'a_position');
-    this.gl.enableVertexAttribArray(positionLocation);
-    this.gl.vertexAttribPointer(positionLocation, 2, this.gl.FLOAT, false, 0, 0);
+    sendPositionsToShader(this.gl, this.shaderProgram, this.vertices, subjectPoints,
+      'a_subjectPosition');
+    sendPositionsToShader(this.gl, this.shaderProgram, this.vertices, alignedCurrentAvgPoints,
+      'a_currentAvgPosition');
+    sendPositionsToShader(this.gl, this.shaderProgram, this.vertices, alignedTargetAvgPoints,
+      'a_targetAvgPosition');
 
     this.gl.drawArrays(this.gl.TRIANGLES, 0, this.vertices.length * 3);
   }
@@ -124,22 +125,40 @@ function createPositionVertices(vertices, points) {
   return positionVertices;
 }
 
+function sendPositionsToShader(gl, shaderProgram, vertices, points, attributeName) {
+  const positionVertices = createPositionVertices(vertices, points);
+
+  const positionBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positionVertices), gl.STATIC_DRAW);
+
+  const attributeLocation = gl.getAttribLocation(shaderProgram, attributeName);
+  gl.enableVertexAttribArray(attributeLocation);
+  gl.vertexAttribPointer(attributeLocation, 2, gl.FLOAT, false, 0, 0);
+}
+
 function createShaderProgram(gl) {
   const vertexShaderCode = `
-    attribute vec2 a_texCoord;
-    attribute vec2 a_position;
+    attribute vec2 a_subjectTexCoord;
 
-    varying vec2 v_texCoord;
+    attribute vec2 a_subjectPosition;
+    attribute vec2 a_currentAvgPosition;
+    attribute vec2 a_targetAvgPosition;
+
+    varying vec2 v_subjectTexCoord;
+    varying vec2 v_currentAvgTexCoord;
+    varying vec2 v_targetAvgTexCoord;
 
     uniform vec2 u_resolution;
 
     void main() {
-      vec2 zeroToOne = a_position / u_resolution;
+      vec2 newPos = a_subjectPosition + 1.0 * (a_targetAvgPosition - a_currentAvgPosition);
+      vec2 zeroToOne = newPos / u_resolution;
       vec2 zeroToTwo = zeroToOne * 2.0;
       vec2 clipSpace = zeroToTwo - 1.0;
       gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
 
-      v_texCoord = a_texCoord;
+      v_subjectTexCoord = a_subjectTexCoord;
     }
   `;
 
@@ -148,10 +167,10 @@ function createShaderProgram(gl) {
 
     uniform sampler2D u_image;
 
-    varying vec2 v_texCoord;
+    varying vec2 v_subjectTexCoord;
 
     void main() {
-      gl_FragColor = texture2D(u_image, v_texCoord);
+      gl_FragColor = texture2D(u_image, v_subjectTexCoord);
     }
   `;
 
