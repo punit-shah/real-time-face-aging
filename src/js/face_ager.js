@@ -1,22 +1,25 @@
 import rigidAlign from './rigid_align';
 
 class FaceAger {
+  // initialise the face ager with a canvas to draw the mask on
+  // @param webglCanvas - a canvas element
   constructor(webglCanvas) {
     this.gl = window.getWebGLContext(webglCanvas);
     this.shaderProgram = createShaderProgram(this.gl);
-    this.texCoordBuffer = this.gl.createBuffer();
   }
 
-  load(textureCanvas, subjectPoints, pModel) {
-    this.pModel = pModel;
-    this.vertices = this.pModel.path.vertices;
-    this.dimensions = findDimensions(subjectPoints, textureCanvas.width, textureCanvas.height);
+  // load the face to age
+  load(faceCanvas, subjectPoints, vertices) {
+    this.vertices = vertices;
+    this.dimensions = findMinMaxDimensions(subjectPoints, faceCanvas.width,
+      faceCanvas.height);
     this.subjectPoints = correctPoints(subjectPoints, this.dimensions.minX, this.dimensions.minY);
     this.textureVertices = createTextureVertices(this.vertices, this.subjectPoints,
       this.dimensions.width, this.dimensions.height);
 
     // put texture coordinates in buffer
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.texCoordBuffer);
+    const texCoordBuffer = this.gl.createBuffer();
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, texCoordBuffer);
     this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.textureVertices),
       this.gl.STATIC_DRAW);
 
@@ -30,9 +33,8 @@ class FaceAger {
     this.gl.vertexAttribPointer(this.texCoordLocation, 2, this.gl.FLOAT, false, 0, 0);
 
     // create texture and bind it
-    const textureImage = textureCanvas.getContext('2d')
-      .getImageData(this.dimensions.minX, this.dimensions.minY, this.dimensions.width,
-        this.dimensions.height);
+    const textureImage = faceCanvas.getContext('2d').getImageData(this.dimensions.minX,
+      this.dimensions.minY, this.dimensions.width, this.dimensions.height);
     createTexture(this.gl, textureImage);
 
     // set the resolution
@@ -60,11 +62,12 @@ class FaceAger {
   }
 }
 
-function findDimensions(points, textureWidth, textureHeight) {
+// finds the minimum and maximum x and y coordinates
+function findMinMaxDimensions(points, frameWidth, frameHeight) {
   let maxX = 0;
-  let minX = textureWidth;
+  let minX = frameWidth;
   let maxY = 0;
-  let minY = textureHeight;
+  let minY = frameHeight;
 
   for (let i = 0; i < points.length; i++) {
     if (points[i][0] > maxX) maxX = points[i][0];
@@ -130,7 +133,8 @@ function sendPositionsToShader(gl, shaderProgram, vertices, points, attributeNam
 
   const positionBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positionVertices), gl.STATIC_DRAW);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positionVertices),
+    gl.STATIC_DRAW);
 
   const attributeLocation = gl.getAttribLocation(shaderProgram, attributeName);
   gl.enableVertexAttribArray(attributeLocation);
@@ -146,8 +150,6 @@ function createShaderProgram(gl) {
     attribute vec2 a_targetAvgPosition;
 
     varying vec2 v_subjectTexCoord;
-    varying vec2 v_currentAvgTexCoord;
-    varying vec2 v_targetAvgTexCoord;
 
     uniform vec2 u_resolution;
 
