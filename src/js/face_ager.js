@@ -232,7 +232,7 @@ function createShaderProgram(gl) {
     uniform vec2 u_resolution;
 
     void main() {
-      vec2 newPos = a_subjectPosition + 1.0 * (a_targetAvgPosition - a_currentAvgPosition);
+      vec2 newPos = a_subjectPosition + 0.75 * (a_targetAvgPosition - a_currentAvgPosition);
       vec2 zeroToOne = newPos / u_resolution;
       vec2 zeroToTwo = zeroToOne * 2.0;
       vec2 clipSpace = zeroToTwo - 1.0;
@@ -259,7 +259,7 @@ function createShaderProgram(gl) {
       vec4 subjectColor = texture2D(u_subjectImage, v_subjectTexCoord);
       vec4 currentAvgColor = texture2D(u_currentAvgImage, v_currentAvgTexCoord);
       vec4 targetAvgColor = texture2D(u_targetAvgImage, v_targetAvgTexCoord);
-      gl_FragColor = subjectColor + 1.0 * (targetAvgColor - currentAvgColor);
+      gl_FragColor = subjectColor + 0.75 * (targetAvgColor - currentAvgColor);
     }
   `;
 
