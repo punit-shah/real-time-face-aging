@@ -2,7 +2,7 @@
 // each pointSet is an array of points
 // each point is an array with two elements representing the point's x and y values
 // e.g. [ [x1, y1], [x2, y2] ]
-function rigidAlign(pointSet1, pointSet2) {
+function procrustesAlign(pointSet1, pointSet2) {
   const mean1 = calcMean(pointSet1);
   const mean2 = calcMean(pointSet2);
 
@@ -93,4 +93,4 @@ function rotatePoints(pointSet, a) {
   return rotatedPoints;
 }
 
-export default rigidAlign;
+export default procrustesAlign;

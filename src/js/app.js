@@ -1,6 +1,6 @@
 import FaceTracker from './face_tracker';
 import FaceAger from './face_ager';
-import { createCanvas, setElementSize } from './utils';
+import { createCanvas, setElementSize, loadImages } from './utils';
 
 import currentAvgPoints from './average_points/mw13-18';
 import targetAvgPoints from './average_points/mw55';
@@ -49,7 +49,14 @@ class App {
   }
 
   initFaceAger() {
-    this.faceAger = new FaceAger(this.maskCanvas);
+    this.faceAger = new FaceAger(this.maskCanvas, this.faceTracker.getVertices());
+    loadImages({
+      currentAvg: '/img/blends/smooth/West-Asian/mw13-18.jpg',
+      targetAvg: '/img/blends/textured/West-Asian/mw55.jpg'
+    }, (images) => {
+      this.faceAger.setCurrentAvg(currentAvgPoints, images.currentAvg);
+      this.faceAger.setTargetAvg(targetAvgPoints, images.targetAvg);
+    });
   }
 
   drawMask() {
@@ -59,8 +66,8 @@ class App {
 
     const subjectPositions = this.faceTracker.tracker.getCurrentPosition();
     if (subjectPositions) {
-      this.faceAger.load(this.videoframeCanvas, subjectPositions, this.faceTracker.getVertices());
-      this.faceAger.draw(subjectPositions, currentAvgPoints, targetAvgPoints);
+      this.faceAger.load(this.videoframeCanvas, subjectPositions);
+      this.faceAger.draw(subjectPositions);
     }
 
     requestAnimationFrame(this.drawMask.bind(this));

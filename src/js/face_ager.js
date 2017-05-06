@@ -1,41 +1,97 @@
-import rigidAlign from './rigid_align';
+import procrustesAlign from './procrustes_align';
+import { createCanvas } from './utils';
 
 class FaceAger {
   // initialise the face ager with a canvas to draw the mask on
   // @param webglCanvas - a canvas element
-  constructor(webglCanvas) {
+  constructor(webglCanvas, vertices) {
     this.gl = window.getWebGLContext(webglCanvas);
     this.shaderProgram = createShaderProgram(this.gl);
+    this.vertices = vertices;
+  }
+
+  setCurrentAvg(points, image) {
+    const dimensions = findMinMaxDimensions(points, image.width, image.height);
+    this.currentAvgTexCoords = this.createTextureCoords(points, dimensions);
+
+    const canvas = createCanvas('current-avg');
+    canvas.width = image.width;
+    canvas.height = image.height;
+    const context = canvas.getContext('2d');
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+    const currentAvgImage = context.getImageData(
+      dimensions.minX, dimensions.minY,
+      dimensions.width, dimensions.height
+    );
+
+    this.currentAvg = {
+      points: points,
+      image: currentAvgImage
+    };
+  }
+
+  setTargetAvg(points, image) {
+    const dimensions = findMinMaxDimensions(points, image.width, image.height);
+    this.targetAvgTexCoords = this.createTextureCoords(points, dimensions);
+
+    const canvas = createCanvas('target-avg');
+    canvas.width = image.width;
+    canvas.height = image.height;
+    const context = canvas.getContext('2d');
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+    const targetAvgImage = context.getImageData(
+      dimensions.minX, dimensions.minY,
+      dimensions.width, dimensions.height
+    );
+
+    this.targetAvg = {
+      points: points,
+      image: targetAvgImage
+    };
   }
 
   // load the face to age
-  load(faceCanvas, subjectPoints, vertices) {
-    this.vertices = vertices;
-    this.dimensions = findMinMaxDimensions(subjectPoints, faceCanvas.width,
+  load(faceCanvas, subjectPoints) {
+    const subjectDimensions = findMinMaxDimensions(subjectPoints, faceCanvas.width,
       faceCanvas.height);
-    this.subjectPoints = correctPoints(subjectPoints, this.dimensions.minX, this.dimensions.minY);
-    this.textureVertices = createTextureVertices(this.vertices, this.subjectPoints,
-      this.dimensions.width, this.dimensions.height);
+    const subjectTextureCoords = this.createTextureCoords(subjectPoints, subjectDimensions);
+    this.loadTextureCoordinates(subjectTextureCoords, 'a_subjectTexCoord');
+    this.loadTextureCoordinates(this.currentAvgTexCoords, 'a_currentAvgTexCoord');
+    this.loadTextureCoordinates(this.targetAvgTexCoords, 'a_targetAvgTexCoord');
 
-    // put texture coordinates in buffer
-    const texCoordBuffer = this.gl.createBuffer();
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, texCoordBuffer);
-    this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.textureVertices),
-      this.gl.STATIC_DRAW);
+    // textures
+    const textureImage = faceCanvas.getContext('2d').getImageData(subjectDimensions.minX,
+      subjectDimensions.minY, subjectDimensions.width, subjectDimensions.height);
 
-    // load shader program
-    this.gl.useProgram(this.shaderProgram);
+    const images = [textureImage, this.currentAvg.image, this.targetAvg.image];
+    const textures = [];
 
-    // look up location of texture coordinate attribute
-    this.texCoordLocation = this.gl.getAttribLocation(this.shaderProgram, 'a_subjectTexCoord');
-    // pull data from buffer into attribute
-    this.gl.enableVertexAttribArray(this.texCoordLocation);
-    this.gl.vertexAttribPointer(this.texCoordLocation, 2, this.gl.FLOAT, false, 0, 0);
+    // create textures from images and add them to textures array
+    for (let i = 0; i < images.length; i++) {
+      const texture = createTexture(this.gl, images[i]);
+      textures.push(texture);
+    }
 
-    // create texture and bind it
-    const textureImage = faceCanvas.getContext('2d').getImageData(this.dimensions.minX,
-      this.dimensions.minY, this.dimensions.width, this.dimensions.height);
-    createTexture(this.gl, textureImage);
+    // get sampler locations
+    const u_subjectImageLocation = this.gl.getUniformLocation(this.shaderProgram,
+      'u_subjectImage');
+    const u_currentAvgImageLocation = this.gl.getUniformLocation(this.shaderProgram,
+      'u_currentAvgImage');
+    const u_targetAvgImageLocation = this.gl.getUniformLocation(this.shaderProgram,
+      'u_targetAvgImage');
+
+    // set texture unit to use for each sampler
+    this.gl.uniform1i(u_subjectImageLocation, 0);
+    this.gl.uniform1i(u_currentAvgImageLocation, 1);
+    this.gl.uniform1i(u_targetAvgImageLocation, 2);
+
+    // bind texture to each texture unit
+    this.gl.activeTexture(this.gl.TEXTURE0);
+    this.gl.bindTexture(this.gl.TEXTURE_2D, textures[0]);
+    this.gl.activeTexture(this.gl.TEXTURE1);
+    this.gl.bindTexture(this.gl.TEXTURE_2D, textures[1]);
+    this.gl.activeTexture(this.gl.TEXTURE2);
+    this.gl.bindTexture(this.gl.TEXTURE_2D, textures[2]);
 
     // set the resolution
     const resolutionLocation = this.gl.getUniformLocation(this.shaderProgram, 'u_resolution');
@@ -43,9 +99,9 @@ class FaceAger {
       this.gl.drawingBufferHeight);
   }
 
-  draw(subjectPoints, currentAvgPoints, targetAvgPoints) {
-    const alignedCurrentAvgPoints = rigidAlign(currentAvgPoints, subjectPoints);
-    const alignedTargetAvgPoints = rigidAlign(targetAvgPoints, subjectPoints);
+  draw(subjectPoints) {
+    const alignedCurrentAvgPoints = procrustesAlign(this.currentAvg.points, subjectPoints);
+    const alignedTargetAvgPoints = procrustesAlign(this.targetAvg.points, subjectPoints);
 
     sendPositionsToShader(this.gl, this.shaderProgram, this.vertices, subjectPoints,
       'a_subjectPosition');
@@ -59,6 +115,39 @@ class FaceAger {
 
   clear() {
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+  }
+
+  createTextureCoords(points, dimensions) {
+    const correctedPoints = correctPoints(points, dimensions.minX, dimensions.minY);
+    const textureCoords = [];
+
+    for (let i = 0; i < this.vertices.length; i++) {
+      textureCoords.push(correctedPoints[this.vertices[i][0]][0] / dimensions.width);
+      textureCoords.push(correctedPoints[this.vertices[i][0]][1] / dimensions.height);
+      textureCoords.push(correctedPoints[this.vertices[i][1]][0] / dimensions.width);
+      textureCoords.push(correctedPoints[this.vertices[i][1]][1] / dimensions.height);
+      textureCoords.push(correctedPoints[this.vertices[i][2]][0] / dimensions.width);
+      textureCoords.push(correctedPoints[this.vertices[i][2]][1] / dimensions.height);
+    }
+
+    return textureCoords;
+  }
+
+  loadTextureCoordinates(textureCoords, attribute) {
+    // put texture coordinates in buffer
+    const texCoordBuffer = this.gl.createBuffer();
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, texCoordBuffer);
+    this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(textureCoords),
+      this.gl.STATIC_DRAW);
+
+    // load shader program
+    this.gl.useProgram(this.shaderProgram);
+
+    // look up location of texture coordinate attribute
+    this.texCoordLocation = this.gl.getAttribLocation(this.shaderProgram, attribute);
+    // pull data from buffer into attribute
+    this.gl.enableVertexAttribArray(this.texCoordLocation);
+    this.gl.vertexAttribPointer(this.texCoordLocation, 2, this.gl.FLOAT, false, 0, 0);
   }
 }
 
@@ -98,21 +187,6 @@ function correctPoints(points, minX, minY) {
   return correctedPoints;
 }
 
-function createTextureVertices(vertices, points, width, height) {
-  const textureVertices = [];
-
-  for (let i = 0; i < vertices.length; i++) {
-    textureVertices.push(points[vertices[i][0]][0] / width);
-    textureVertices.push(points[vertices[i][0]][1] / height);
-    textureVertices.push(points[vertices[i][1]][0] / width);
-    textureVertices.push(points[vertices[i][1]][1] / height);
-    textureVertices.push(points[vertices[i][2]][0] / width);
-    textureVertices.push(points[vertices[i][2]][1] / height);
-  }
-
-  return textureVertices;
-}
-
 function createPositionVertices(vertices, points) {
   const positionVertices = [];
 
@@ -144,12 +218,16 @@ function sendPositionsToShader(gl, shaderProgram, vertices, points, attributeNam
 function createShaderProgram(gl) {
   const vertexShaderCode = `
     attribute vec2 a_subjectTexCoord;
+    attribute vec2 a_currentAvgTexCoord;
+    attribute vec2 a_targetAvgTexCoord;
 
     attribute vec2 a_subjectPosition;
     attribute vec2 a_currentAvgPosition;
     attribute vec2 a_targetAvgPosition;
 
     varying vec2 v_subjectTexCoord;
+    varying vec2 v_currentAvgTexCoord;
+    varying vec2 v_targetAvgTexCoord;
 
     uniform vec2 u_resolution;
 
@@ -161,18 +239,27 @@ function createShaderProgram(gl) {
       gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
 
       v_subjectTexCoord = a_subjectTexCoord;
+      v_currentAvgTexCoord = a_currentAvgTexCoord;
+      v_targetAvgTexCoord = a_targetAvgTexCoord;
     }
   `;
 
   const fragmentShaderCode = `
     precision mediump float;
 
-    uniform sampler2D u_image;
+    uniform sampler2D u_subjectImage;
+    uniform sampler2D u_currentAvgImage;
+    uniform sampler2D u_targetAvgImage;
 
     varying vec2 v_subjectTexCoord;
+    varying vec2 v_currentAvgTexCoord;
+    varying vec2 v_targetAvgTexCoord;
 
     void main() {
-      gl_FragColor = texture2D(u_image, v_subjectTexCoord);
+      vec4 subjectColor = texture2D(u_subjectImage, v_subjectTexCoord);
+      vec4 currentAvgColor = texture2D(u_currentAvgImage, v_currentAvgTexCoord);
+      vec4 targetAvgColor = texture2D(u_targetAvgImage, v_targetAvgTexCoord);
+      gl_FragColor = subjectColor + 1.0 * (targetAvgColor - currentAvgColor);
     }
   `;
 
@@ -183,16 +270,21 @@ function createShaderProgram(gl) {
 }
 
 function createTexture(gl, image) {
+  // create new texture
   const texture = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, texture);
 
+  // prevent texture repeating
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  // use filters that don't mipmap
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 
-  // Upload the image into the texture.
+  // upload image into the texture
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+
+  return texture;
 }
 
 export default FaceAger;
