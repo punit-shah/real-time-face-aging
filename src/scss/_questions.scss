@@ -22,6 +22,7 @@
     display: block;
     width: 45%;
     margin: 0.5rem auto;
+    border: solid 1px transparent;
     background-color: #ddd;
 
     @media (min-width: 600px) {
@@ -35,6 +36,11 @@
         padding: 1rem;
       }
     }
+  }
+
+  &__option--selected {
+    font-weight: bold;
+    border-color: #000;
   }
 
   &__option--selected,
