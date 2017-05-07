@@ -1,18 +1,21 @@
-// aligns pointSet1 to pointSet2
-// each pointSet is an array of points
-// each point is an array with two elements representing the point's x and y values
-// e.g. [ [x1, y1], [x2, y2] ]
+/**
+ * aligns pointSet1 to pointSet2
+ * each pointSet is an array of points
+ * each point is an array with two elements representing the point's x and y values
+ * e.g. [ [x1, y1], [x2, y2] ]
+ */
 function procrustesAlign(pointSet1, pointSet2) {
   const mean1 = calcMean(pointSet1);
   const mean2 = calcMean(pointSet2);
 
+  // subtract mean from points
   let points1 = subtractFromPoints(pointSet1, mean1);
   let points2 = subtractFromPoints(pointSet2, mean2);
 
   const s1 = calcSumOfSquaredDistance(points1);
   const s2 = calcSumOfSquaredDistance(points2);
-  const scaleFactor = s2 / s1;
-  points1 = scalePoints(points1, scaleFactor);
+  const scaling = s2 / s1;
+  points1 = scalePoints(points1, scaling);
 
   // A = sum_i(x1[i] * y2[i] - y1[i] * x2[i])
   let A = 0;
@@ -26,16 +29,20 @@ function procrustesAlign(pointSet1, pointSet2) {
     B += points1[i][0] * points2[i][0] + points1[i][1] * points2[i][1];
   }
 
+  // theta = tan^-1(A / B)
   const rotationAngle = Math.atan2(A, B);
   points1 = rotatePoints(points1, rotationAngle);
 
+  // add mean of pointSet2
   points1 = addToPoints(points1, mean2);
 
   return points1;
 }
 
-// calculates the mean of a pointSet
-// returns array with two elements representing the mean of the set's x and y values
+/**
+ * calculates the mean of a pointSet
+ * @return an array containing the means of the pointSet's x and y values
+ */
 function calcMean(pointSet) {
   const xSum = pointSet
     .map(point => point[0])             // creates new array with only the x values of each point
@@ -50,6 +57,13 @@ function calcMean(pointSet) {
   return [xMean, yMean];
 }
 
+/**
+ * subtracts from all values of a pointSet
+ * @param  pointSet       the pointSet to subtract from
+ * @param  subtractValues an array containing a value to subtract from the x values and a value
+ *                        to subtract from the y values
+ * @return                the pointSet with the values subtracted
+ */
 function subtractFromPoints(pointSet, subtractValues) {
   return pointSet.map((point) => {
     const x = point[0] - subtractValues[0];
@@ -58,6 +72,9 @@ function subtractFromPoints(pointSet, subtractValues) {
   });
 }
 
+/**
+ * like subtractFromPoints(), but adds instead of subtracting
+ */
 function addToPoints(pointSet, addValues) {
   return pointSet.map((point) => {
     const x = point[0] + addValues[0];
@@ -74,20 +91,25 @@ function calcSumOfSquaredDistance(pointSet) {
   return sum;
 }
 
-function scalePoints(pointSet, scaleFactor) {
+/**
+ * scales all points in a pointSet by a value
+ */
+function scalePoints(pointSet, scale) {
   const scaledPointSet = pointSet.map((point) => {
-    const x = point[0] * scaleFactor;
-    const y = point[1] * scaleFactor;
+    const x = point[0] * scale;
+    const y = point[1] * scale;
     return [x, y];
   });
   return scaledPointSet;
 }
 
-// @param a - rotation angle
-function rotatePoints(pointSet, a) {
+/**
+ * rotates the shape represented by a pointSet by an angle
+ */
+function rotatePoints(pointSet, rotationAngle) {
   const rotatedPoints = pointSet.map((point) => {
-    const x = Math.cos(a) * point[0] - Math.sin(a) * point[1];
-    const y = Math.sin(a) * point[0] + Math.cos(a) * point[1];
+    const x = Math.cos(rotationAngle) * point[0] - Math.sin(rotationAngle) * point[1];
+    const y = Math.sin(rotationAngle) * point[0] + Math.cos(rotationAngle) * point[1];
     return [x, y];
   });
   return rotatedPoints;

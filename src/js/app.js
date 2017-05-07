@@ -3,10 +3,18 @@ import FaceAger from './face_ager';
 import { createCanvas, setElementSize, loadImages, loadDataFiles } from './utils';
 
 class App {
+  /**
+   * @param containerElement a container element for the application
+   */
   constructor(containerElement) {
     this.containerElement = containerElement;
   }
 
+  /**
+   * initialise the application
+   * @param userDetails an object containing details chosen by the user. used to select which
+   *                    average textures to use
+   */
   init(userDetails) {
     this.userDetails = userDetails;
 
@@ -22,6 +30,9 @@ class App {
     this.initResetButton();
   }
 
+  /**
+   * initialises the face tracker. calls drawMask() when the tracker has converged
+   */
   initFaceTracker() {
     this.faceTracker = new FaceTracker(this.containerElement, () => {
       this.drawMask();
@@ -29,17 +40,23 @@ class App {
     this.faceTracker.init();
   }
 
+  /**
+   * creates canvases for the face ager
+   */
   initCanvases() {
     // canvas to copy video frames to
     // does not need to be appended to DOM
     this.videoframeCanvas = createCanvas('videoframe');
     this.videoframeContext = this.videoframeCanvas.getContext('2d');
 
-    // canvas to draw webgl mask
+    // canvas to draw aged face
     this.maskCanvas = createCanvas('mask');
     this.containerElement.appendChild(this.maskCanvas);
   }
 
+  /**
+   * sets the sizes of the canvases to the size of the webcam video
+   */
   setSizes() {
     const width = this.faceTracker.video.width;
     const height = this.faceTracker.video.height;
@@ -48,15 +65,21 @@ class App {
     setElementSize(this.videoframeCanvas, width, height);
   }
 
+  /**
+   * initialise the face ager
+   */
   initFaceAger() {
     this.faceAger = new FaceAger(this.maskCanvas, this.faceTracker.getVertices());
+
+    // load average points
     loadDataFiles({
-      currentAvgPoints: `/data/${this.getBlendFilename(true)}.json`,
-      targetAvgPoints: `/data/${this.getBlendFilename(false)}.json`
+      currentAvgPoints: `/data/${this.getAverageFilename(true)}.json`,
+      targetAvgPoints: `/data/${this.getAverageFilename(false)}.json`
     }, (data) => {
+      // load average texture images
       loadImages({
-        currentAvgImage: this.getBlendImagePath(true),
-        targetAvgImage: this.getBlendImagePath(false)
+        currentAvgImage: this.getAverageImagePath(true),
+        targetAvgImage: this.getAverageImagePath(false)
       }, (images) => {
         this.faceAger.setCurrentAvg(data.currentAvgPoints, images.currentAvgImage);
         this.faceAger.setTargetAvg(data.targetAvgPoints, images.targetAvgImage);
@@ -64,6 +87,9 @@ class App {
     });
   }
 
+  /**
+   * initialises the reset button
+   */
   initResetButton() {
     const resetButton = this.createResetButton();
     this.containerElement.appendChild(resetButton);
@@ -72,6 +98,9 @@ class App {
     });
   }
 
+  /**
+   * uses the face ager to draw the aged face
+   */
   drawMask() {
     // copy video frame to canvas
     this.videoframeContext.drawImage(this.faceTracker.video, 0, 0,
@@ -86,7 +115,9 @@ class App {
     this.drawMaskRequestId = requestAnimationFrame(this.drawMask.bind(this));
   }
 
-  // stops the application and goes back to the question UI
+  /**
+   * stops the application and goes back to the question UI
+   */
   reset() {
     if (this.drawMaskRequestId) {
       cancelAnimationFrame(this.drawMaskRequestId);
@@ -100,14 +131,24 @@ class App {
     document.getElementsByClassName('question')[0].classList.add('question--active');
   }
 
-  getBlendFilename(current) {
+  /**
+   * uses the user details to get the filename for an average
+   * @param {boolean} current if true, gets filename for the current average. if false, gets
+   *                          filename for the target average
+   */
+  getAverageFilename(current) {
     let filename = this.userDetails.gender + this.userDetails.ethnicity;
     filename += current ? this.userDetails.ageGroup : '55';
 
     return filename;
   }
 
-  getBlendImagePath(current) {
+  /**
+   * uses the user details to get the filepath to an average texture image
+   * @param {boolean} current if true, gets filepath for the current average. if false, gets
+   *                          filepath for the target average
+   */
+  getAverageImagePath(current) {
     const ethnicityMap = {
       a: 'AfroCaribbean/',
       c: 'Caucasian/',
@@ -118,7 +159,7 @@ class App {
     let imagePath = '/img/blends/';
     imagePath += current ? 'smooth/' : 'textured/';
     imagePath += ethnicityMap[this.userDetails.ethnicity];
-    imagePath += `${this.getBlendFilename(current)}.jpg`;
+    imagePath += `${this.getAverageFilename(current)}.jpg`;
 
     return imagePath;
   }

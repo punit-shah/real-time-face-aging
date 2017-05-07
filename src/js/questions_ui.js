@@ -1,3 +1,9 @@
+/**
+ * initialises the questions user interface
+ * @param {function} startButtonClick function called when the start button is clicked. takes a
+ *                                    single argument - an object with the details provided by the
+ *                                    user
+ */
 function initQuestionsUI(startButtonClick) {
   const questions = document.getElementsByClassName('question');
   const radioButtons = document.getElementsByClassName('question__checkbox');
