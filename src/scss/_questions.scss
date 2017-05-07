@@ -83,28 +83,32 @@
     position: absolute;
     top: -20px;
   }
+}
 
-  &__btn {
-    display: block;
-    padding: 0.5rem 1rem;
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: bold;
-    margin: auto;
-    border: 0;
-    color: #fff;
+.btn {
+  display: block;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+  margin: auto;
+  border: 0;
+  color: #fff;
 
-    &--next {
-      background-color: #8dbe40;
-    }
+  &--next {
+    background-color: #8dbe40;
+  }
 
-    &--start {
-      background-color: #ce3e26;
-    }
+  &--start {
+    background-color: #ce3e26;
+  }
 
-    &:disabled {
-      background-color: #e5e5e5;
-      color: #666;
-    }
+  &--reset {
+    background-color: #f29120;
+  }
+
+  &:disabled {
+    background-color: #e5e5e5;
+    color: #666;
   }
 }

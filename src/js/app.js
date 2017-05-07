@@ -19,6 +19,7 @@ class App {
     });
 
     this.initFaceAger();
+    this.initResetButton();
   }
 
   initFaceTracker() {
@@ -63,6 +64,14 @@ class App {
     });
   }
 
+  initResetButton() {
+    const resetButton = this.createResetButton();
+    this.containerElement.appendChild(resetButton);
+    resetButton.addEventListener('click', () => {
+      this.stop();
+    });
+  }
+
   drawMask() {
     // copy video frame to canvas
     this.videoframeContext.drawImage(this.faceTracker.video, 0, 0,
@@ -74,7 +83,21 @@ class App {
       this.faceAger.draw(subjectPositions);
     }
 
-    requestAnimationFrame(this.drawMask.bind(this));
+    this.drawMaskRequestId = requestAnimationFrame(this.drawMask.bind(this));
+  }
+
+  // stops the application and goes back to the question UI
+  reset() {
+    if (this.drawMaskRequestId) {
+      cancelAnimationFrame(this.drawMaskRequestId);
+      this.drawMaskRequestId = undefined;
+    }
+    this.faceTracker.stop();
+    this.userDetails = undefined;
+    while (this.containerElement.hasChildNodes()) {
+      this.containerElement.removeChild(this.containerElement.lastChild);
+    }
+    document.getElementsByClassName('question')[0].classList.add('question--active');
   }
 
   getBlendFilename(current) {
@@ -98,6 +121,14 @@ class App {
     imagePath += `${this.getBlendFilename(current)}.jpg`;
 
     return imagePath;
+  }
+
+  createResetButton() {
+    const resetButton = document.createElement('button');
+    resetButton.classList.add('btn', 'btn--reset');
+    resetButton.id = 'reset-btn';
+    resetButton.textContent = 'Reset';
+    return resetButton;
   }
 }
 

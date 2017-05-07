@@ -87,11 +87,19 @@ class FaceTracker {
         this.clearGrid();
         this.convergedCallback();
       } else {
-        requestAnimationFrame(this.drawGrid.bind(this));
+        this.drawGridRequestId = requestAnimationFrame(this.drawGrid.bind(this));
       }
     } else {
-      requestAnimationFrame(this.drawGrid.bind(this));
+      this.drawGridRequestId = requestAnimationFrame(this.drawGrid.bind(this));
     }
+  }
+
+  stop() {
+    if (this.drawGridRequestId) {
+      cancelAnimationFrame(this.drawGridRequestId);
+      this.drawGridRequestId = undefined;
+    }
+    this.tracker.stop();
   }
 
   getVertices() {
