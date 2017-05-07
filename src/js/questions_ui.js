@@ -5,6 +5,8 @@ function initQuestionsUI(startButtonClick) {
 
   for (let radioButton of radioButtons) {
     radioButton.addEventListener('change', radioButtonChange);
+    radioButton.addEventListener('focus', radioButtonFocus);
+    radioButton.addEventListener('blur', radioButtonBlur);
   }
 
   document.getElementById('gender-btn').addEventListener('click', () => {
@@ -46,6 +48,14 @@ function radioButtonChange() {
   if (questionButton.disabled) {
     questionButton.disabled = false;
   }
+}
+
+function radioButtonFocus() {
+  this.parentElement.parentElement.classList.add('question__option--focus');
+}
+
+function radioButtonBlur() {
+  this.parentElement.parentElement.classList.remove('question__option--focus');
 }
 
 export default initQuestionsUI;

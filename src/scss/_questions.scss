@@ -44,9 +44,8 @@
   }
 
   &__option--selected,
-  &__option:hover,
-  &__option:focus,
-  &__option:active {
+  &__option--focus,
+  &__option:hover {
     &.question__option--gender {
       background-color: #f2bf4a;
     }
