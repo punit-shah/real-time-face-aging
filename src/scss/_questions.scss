@@ -27,6 +27,14 @@
     @media (min-width: 600px) {
       margin: 1rem auto;
     }
+
+    &--ethnicity > .question__option-label {
+      padding: 0.5rem;
+
+      @media (min-width: 600px) {
+        padding: 1rem;
+      }
+    }
   }
 
   &__option--selected,
@@ -34,7 +42,7 @@
   &__option:focus,
   &__option:active {
     &.question__option--gender {
-      background-color: #f46b59;
+      background-color: #f2bf4a;
     }
 
     &.question__option--age-group {
@@ -53,6 +61,16 @@
     position: relative;
     overflow: hidden;
     text-align: center;
+
+    > img {
+      display: block;
+      margin: auto;
+      width: 100%;
+
+      @media (min-width: 400px) {
+        width: auto;
+      }
+    }
   }
 
   &__checkbox {
@@ -71,7 +89,7 @@
     color: #fff;
 
     &--next {
-      background-color: #008080;
+      background-color: #8dbe40;
     }
 
     &--start {
