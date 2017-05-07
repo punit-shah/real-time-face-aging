@@ -232,7 +232,7 @@ function createShaderProgram(gl) {
     uniform vec2 u_resolution;
 
     void main() {
-      vec2 newPos = a_subjectPosition + 0.75 * (a_targetAvgPosition - a_currentAvgPosition);
+      vec2 newPos = a_subjectPosition + 2.0 * (a_targetAvgPosition - a_currentAvgPosition);
       vec2 zeroToOne = newPos / u_resolution;
       vec2 zeroToTwo = zeroToOne * 2.0;
       vec2 clipSpace = zeroToTwo - 1.0;
