@@ -29,4 +29,24 @@ function loadImages(imageSources, callback) {
   }
 }
 
-export { createCanvas, setElementSize, loadImages };
+function loadDataFiles(fileSources, callback) {
+  const data = {};
+  const numOfFiles = Object.keys(fileSources).length;
+
+  let loadedFiles = 0;
+
+  for (let key in fileSources) {
+    const xhr = new XMLHttpRequest();
+    xhr.onload = function () {
+      loadedFiles++;
+      data[key] = JSON.parse(this.responseText);
+      if (loadedFiles >= numOfFiles) {
+        callback(data);
+      }
+    };
+    xhr.open('GET', fileSources[key]);
+    xhr.send();
+  }
+}
+
+export { createCanvas, setElementSize, loadImages, loadDataFiles };

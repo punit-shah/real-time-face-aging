@@ -10,88 +10,88 @@
     <div class="question question--active">
       <h2 class="question__text">What is your gender?</h2>
       <ul class="question__option-list">
-        <li class="question__option question__option--gender">
+        <li class="question__option question__option--gender" tabindex="0">
           <label class="question__option-label">
-            <input type="radio" name="gender" class="question__checkbox" id="question__checkbox--male" value="Male">
+            <input type="radio" name="gender" class="question__checkbox" id="question__checkbox--male" value="m" tabindex="-1">
             <span class="question__option-text">Male</span>
           </label>
         </li>
-        <li class="question__option question__option--gender">
+        <li class="question__option question__option--gender" tabindex="0">
           <label class="question__option-label">
-            <input type="radio" name="gender" class="question__checkbox" id="question__checkbox--female" value="Female">
+            <input type="radio" name="gender" class="question__checkbox" id="question__checkbox--female" value="f" tabindex="-1">
             <span class="question__option-text">Female</span>
           </label>
         </li>
       </ul>
-      <button class="question__btn question__btn--next" id="q1-next" disabled>Next</button>
+      <button class="question__btn question__btn--next" id="gender-btn" disabled>Next</button>
     </div>
     <div class="question">
       <h2 class="question__text">What is your age group?</h2>
       <ul class="question__option-list">
-        <li class="question__option question__option--age-group">
+        <li class="question__option question__option--age-group" tabindex="0">
           <label class="question__option-label">
-            <input type="radio" name="age-group" class="question__checkbox" id="question__checkbox--child" value="Child">
+            <input type="radio" name="age-group" class="question__checkbox" id="question__checkbox--child" value="8-12" tabindex="-1">
             <span class="question__option-text">Child</span>
           </label>
         </li>
-        <li class="question__option question__option--age-group">
+        <li class="question__option question__option--age-group" tabindex="0">
           <label class="question__option-label">
-            <input type="radio" name="age-group" class="question__checkbox" id="question__checkbox--teenager" value="Teenager">
+            <input type="radio" name="age-group" class="question__checkbox" id="question__checkbox--teenager" value="13-18" tabindex="-1">
             <span class="question__option-text">Teenager</span>
           </label>
         </li>
-        <li class="question__option question__option--age-group">
+        <li class="question__option question__option--age-group" tabindex="0">
           <label class="question__option-label">
-            <input type="radio" name="age-group" class="question__checkbox" id="question__checkbox--adult" value="Adult">
+            <input type="radio" name="age-group" class="question__checkbox" id="question__checkbox--adult" value="25-35" tabindex="-1">
             <span class="question__option-text">Adult</span>
           </label>
         </li>
-        <li class="question__option question__option--age-group">
+        <li class="question__option question__option--age-group" tabindex="0">
           <label class="question__option-label">
-            <input type="radio" name="age-group" class="question__checkbox" id="question__checkbox--senior" value="Senior">
+            <input type="radio" name="age-group" class="question__checkbox" id="question__checkbox--senior" value="55" tabindex="-1">
             <span class="question__option-text">Senior</span>
           </label>
         </li>
       </ul>
-      <button class="question__btn question__btn--next" id="q2-next" disabled>Next</button>
+      <button class="question__btn question__btn--next" id="age-group-btn" disabled>Next</button>
     </div>
     <div class="question">
       <h2 class="question__text">Which of these faces is yours most similar to?</h2>
       <ul class="question__option-list">
-        <li class="question__option question__option--ethnicity">
+        <li class="question__option question__option--ethnicity" tabindex="0">
           <label class="question__option-label">
-            <input type="radio" name="ethnicity" class="question__checkbox" id="question__checkbox--black" value="Black">
+            <input type="radio" name="ethnicity" class="question__checkbox" id="question__checkbox--black" value="a" tabindex="-1">
             <span class="question__option-text">
               <img src="img/thumbnails/black.jpg" alt="Black">
             </span>
           </label>
         </li>
-        <li class="question__option question__option--ethnicity">
+        <li class="question__option question__option--ethnicity" tabindex="0">
           <label class="question__option-label">
-            <input type="radio" name="ethnicity" class="question__checkbox" id="question__checkbox--white" value="White">
+            <input type="radio" name="ethnicity" class="question__checkbox" id="question__checkbox--white" value="c" tabindex="-1">
             <span class="question__option-text">
               <img src="img/thumbnails/white.jpg" alt="White">
             </span>
           </label>
         </li>
-        <li class="question__option question__option--ethnicity">
+        <li class="question__option question__option--ethnicity" tabindex="0">
           <label class="question__option-label">
-            <input type="radio" name="ethnicity" class="question__checkbox" id="question__checkbox--eastasian" value="East-Asian">
+            <input type="radio" name="ethnicity" class="question__checkbox" id="question__checkbox--eastasian" value="e" tabindex="-1">
             <span class="question__option-text">
               <img src="img/thumbnails/eastasian.jpg" alt="East-Asian">
             </span>
           </label>
         </li>
-        <li class="question__option question__option--ethnicity">
+        <li class="question__option question__option--ethnicity" tabindex="0">
           <label class="question__option-label">
-            <input type="radio" name="ethnicity" class="question__checkbox" id="question__checkbox--southasian" value="South-Asian">
+            <input type="radio" name="ethnicity" class="question__checkbox" id="question__checkbox--southasian" value="w" tabindex="-1">
             <span class="question__option-text">
               <img src="img/thumbnails/southasian.jpg" alt="South-Asian">
             </span>
           </label>
         </li>
       </ul>
-      <button class="question__btn question__btn--start" id="start" disabled>Start</button>
+      <button class="question__btn question__btn--start" id="ethnicity-btn" disabled>Start</button>
     </div>
     <div id="video-container"></div>
   </div>

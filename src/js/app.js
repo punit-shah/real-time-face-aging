@@ -1,16 +1,15 @@
 import FaceTracker from './face_tracker';
 import FaceAger from './face_ager';
-import { createCanvas, setElementSize, loadImages } from './utils';
-
-import currentAvgPoints from './average_points/mw13-18';
-import targetAvgPoints from './average_points/mw55';
+import { createCanvas, setElementSize, loadImages, loadDataFiles } from './utils';
 
 class App {
   constructor(containerElement) {
     this.containerElement = containerElement;
   }
 
-  init() {
+  init(userDetails) {
+    this.userDetails = userDetails;
+
     this.initFaceTracker();
     this.initCanvases();
 
@@ -50,12 +49,17 @@ class App {
 
   initFaceAger() {
     this.faceAger = new FaceAger(this.maskCanvas, this.faceTracker.getVertices());
-    loadImages({
-      currentAvg: '/img/blends/smooth/West-Asian/mw13-18.jpg',
-      targetAvg: '/img/blends/textured/West-Asian/mw55.jpg'
-    }, (images) => {
-      this.faceAger.setCurrentAvg(currentAvgPoints, images.currentAvg);
-      this.faceAger.setTargetAvg(targetAvgPoints, images.targetAvg);
+    loadDataFiles({
+      currentAvgPoints: `/data/${this.getBlendFilename(true)}.json`,
+      targetAvgPoints: `/data/${this.getBlendFilename(false)}.json`
+    }, (data) => {
+      loadImages({
+        currentAvgImage: this.getBlendImagePath(true),
+        targetAvgImage: this.getBlendImagePath(false)
+      }, (images) => {
+        this.faceAger.setCurrentAvg(data.currentAvgPoints, images.currentAvgImage);
+        this.faceAger.setTargetAvg(data.targetAvgPoints, images.targetAvgImage);
+      });
     });
   }
 
@@ -71,6 +75,29 @@ class App {
     }
 
     requestAnimationFrame(this.drawMask.bind(this));
+  }
+
+  getBlendFilename(current) {
+    let filename = this.userDetails.gender + this.userDetails.ethnicity;
+    filename += current ? this.userDetails.ageGroup : '55';
+
+    return filename;
+  }
+
+  getBlendImagePath(current) {
+    const ethnicityMap = {
+      a: 'AfroCaribbean/',
+      c: 'Caucasian/',
+      e: 'East-Asian/',
+      w: 'West-Asian/'
+    };
+
+    let imagePath = '/img/blends/';
+    imagePath += current ? 'smooth/' : 'textured/';
+    imagePath += ethnicityMap[this.userDetails.ethnicity];
+    imagePath += `${this.getBlendFilename(current)}.jpg`;
+
+    return imagePath;
   }
 }
 

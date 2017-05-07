@@ -75,7 +75,8 @@ const config = {
     }),
     new CopyWebpackPlugin([
       {from: '*.html'},
-      {from: 'img/**/*'},
+      {from: 'img/**/*.{jpg,png}'},
+      {from: 'data/*.json'},
     ])
   ],
 
