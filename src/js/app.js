@@ -68,7 +68,7 @@ class App {
     const resetButton = this.createResetButton();
     this.containerElement.appendChild(resetButton);
     resetButton.addEventListener('click', () => {
-      this.stop();
+      this.reset();
     });
   }
 
