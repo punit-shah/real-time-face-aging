@@ -81,8 +81,8 @@ class App {
         currentAvgImage: this.getAverageImagePath(true),
         targetAvgImage: this.getAverageImagePath(false)
       }, (images) => {
-        this.faceAger.setCurrentAvg(data.currentAvgPoints, images.currentAvgImage);
-        this.faceAger.setTargetAvg(data.targetAvgPoints, images.targetAvgImage);
+        this.faceAger.setCurrentAvg(images.currentAvgImage, data.currentAvgPoints);
+        this.faceAger.setTargetAvg(images.targetAvgImage, data.targetAvgPoints);
       });
     });
   }
