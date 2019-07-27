@@ -1,11 +1,21 @@
 {
-  "name": "major_project",
+  "name": "real-time-face-aging",
   "version": "1.0.0",
   "description": "Face aging in real time on the web",
   "main": "index.js",
   "author": "Punit Shah",
   "license": "MIT",
-  "dependencies": {
+  "homepage": "https://punit-shah.github.io/real-time-face-aging",
+  "scripts": {
+    "start": "webpack-dev-server",
+    "lint": "eslint src/js/*.js",
+    "build": "webpack",
+    "watch": "webpack --watch",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
+    "open": "xdg-open http://localhost:8080"
+  },
+  "devDependencies": {
     "babel-core": "^6.24.0",
     "babel-loader": "^6.4.1",
     "babel-preset-env": "^1.3.2",
@@ -14,16 +24,10 @@
     "eslint": "^3.19.0",
     "eslint-loader": "^1.7.1",
     "extract-text-webpack-plugin": "^2.1.0",
+    "gh-pages": "^2.0.1",
     "node-sass": "^4.5.2",
     "sass-loader": "^6.0.3",
     "webpack": "^2.3.2",
     "webpack-dev-server": "^2.4.2"
-  },
-  "scripts": {
-    "start": "webpack-dev-server",
-    "lint": "eslint src/js/*.js",
-    "build": "webpack",
-    "watch": "webpack --watch",
-    "open": "xdg-open http://localhost:8080"
   }
 }
