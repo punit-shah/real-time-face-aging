@@ -1,7 +1,8 @@
 # real-time-face-aging
 
 Face aging in real time on the web.
-👦 => 👴
+
+👦 ➡️ 👴
 
 The application source code can be found in the `src` directory.
 
@@ -9,6 +10,7 @@ The application source code can be found in the `src` directory.
 
 You will need to have Node.js and Yarn installed on your computer.
 You can download them from:
+
 - https://nodejs.org/en/
 - https://yarnpkg.com/lang/en/
 
