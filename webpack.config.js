@@ -65,31 +65,34 @@ const config = {
   plugins: [
     new webpack.LoaderOptionsPlugin({
       minimize: true,
-      debug: false
+      debug: false,
+    }),
+    new webpack.DefinePlugin({
+      PRODUCTION: JSON.stringify(process.env.NODE_ENV === 'production'),
+      HOMEPAGE: JSON.stringify(require('./package.json').homepage),
     }),
     new webpack.optimize.UglifyJsPlugin(),
     new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.HotModuleReplacementPlugin(),
     new ExtractTextPlugin({
-      filename: (getPath) => getPath('css/[name].css').replace('css/js', 'css'),
+      filename: getPath => getPath('css/[name].css').replace('css/js', 'css'),
     }),
     new CopyWebpackPlugin([
-      {from: '*.html'},
-      {from: 'img/**/*.{jpg,png}'},
-      {from: 'data/*.json'},
-    ])
+      { from: '*.html' },
+      { from: 'img/**/*.{jpg,png}' },
+      { from: 'data/*.json' },
+    ]),
   ],
 
   devServer: {
     contentBase: path.resolve(__dirname, 'build'),
     compress: true,
     hot: true,
-  }
+  },
 };
 
-fs.readdirSync('src/scss').map((file) => {
+fs.readdirSync('src/scss').forEach(file => {
   if (file.endsWith('.scss') && !file.startsWith('_')) {
-    const name = file.slice(0, -5);
     config.entry['js/index'].push(`./scss/${file}`);
   }
 });

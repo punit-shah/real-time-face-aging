@@ -10,8 +10,9 @@
     "start": "webpack-dev-server",
     "lint": "eslint src/js/*.js",
     "build": "webpack",
+    "build:prod": "NODE_ENV=production webpack",
     "watch": "webpack --watch",
-    "predeploy": "npm run build",
+    "predeploy": "npm run build:prod",
     "deploy": "gh-pages -d build",
     "open": "xdg-open http://localhost:8080"
   },

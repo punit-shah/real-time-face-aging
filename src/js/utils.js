@@ -1,3 +1,5 @@
+const STATIC_ASSET_HOST = PRODUCTION ? HOMEPAGE : '';
+
 function createCanvas(id) {
   const canvas = document.createElement('canvas');
   canvas.classList.add('canvas');
@@ -24,7 +26,7 @@ function loadImages(imageSources, callback) {
         callback(images);
       }
     };
-    img.src = imageSources[key];
+    img.src = STATIC_ASSET_HOST + imageSources[key];
     images[key] = img;
   }
 }
@@ -44,7 +46,7 @@ function loadDataFiles(fileSources, callback) {
         callback(data);
       }
     };
-    xhr.open('GET', fileSources[key]);
+    xhr.open('GET', STATIC_ASSET_HOST + fileSources[key]);
     xhr.send();
   }
 }
