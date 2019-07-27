@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Face ageing in real-time on the web</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+  <div class="container">
+    <h1 class="title">Face ageing in real-time on the web</h1>
+    <div class="question question--active">
+      <h2 class="question__text">What is your gender?</h2>
+      <ul class="question__option-list">
+        <li class="question__option question__option--gender">
+          <label class="question__option-label">
+            <input type="radio" name="gender" class="question__checkbox" id="question__checkbox--male" value="m">
+            <span class="question__option-text">Male</span>
+          </label>
+        </li>
+        <li class="question__option question__option--gender">
+          <label class="question__option-label">
+            <input type="radio" name="gender" class="question__checkbox" id="question__checkbox--female" value="f">
+            <span class="question__option-text">Female</span>
+          </label>
+        </li>
+      </ul>
+      <button class="btn btn--next" id="gender-btn" disabled>Next</button>
+    </div>
+    <div class="question">
+      <h2 class="question__text">What is your age group?</h2>
+      <ul class="question__option-list">
+        <li class="question__option question__option--age-group">
+          <label class="question__option-label">
+            <input type="radio" name="age-group" class="question__checkbox" id="question__checkbox--child" value="8-12">
+            <span class="question__option-text">Child</span>
+          </label>
+        </li>
+        <li class="question__option question__option--age-group">
+          <label class="question__option-label">
+            <input type="radio" name="age-group" class="question__checkbox" id="question__checkbox--teenager" value="13-18">
+            <span class="question__option-text">Teenager</span>
+          </label>
+        </li>
+        <li class="question__option question__option--age-group">
+          <label class="question__option-label">
+            <input type="radio" name="age-group" class="question__checkbox" id="question__checkbox--adult" value="25-35">
+            <span class="question__option-text">Adult</span>
+          </label>
+        </li>
+        <li class="question__option question__option--age-group">
+          <label class="question__option-label">
+            <input type="radio" name="age-group" class="question__checkbox" id="question__checkbox--senior" value="55">
+            <span class="question__option-text">Senior</span>
+          </label>
+        </li>
+      </ul>
+      <button class="btn btn--next" id="age-group-btn" disabled>Next</button>
+    </div>
+    <div class="question">
+      <h2 class="question__text">Which of these faces is yours most similar to?</h2>
+      <ul class="question__option-list">
+        <li class="question__option question__option--ethnicity">
+          <label class="question__option-label">
+            <input type="radio" name="ethnicity" class="question__checkbox" id="question__checkbox--black" value="a">
+            <img src="img/thumbnails/black.jpg" alt="Black">
+          </label>
+        </li>
+        <li class="question__option question__option--ethnicity">
+          <label class="question__option-label">
+            <input type="radio" name="ethnicity" class="question__checkbox" id="question__checkbox--white" value="c">
+            <img src="img/thumbnails/white.jpg" alt="White">
+          </label>
+        </li>
+        <li class="question__option question__option--ethnicity">
+          <label class="question__option-label">
+            <input type="radio" name="ethnicity" class="question__checkbox" id="question__checkbox--eastasian" value="e">
+            <img src="img/thumbnails/eastasian.jpg" alt="East-Asian">
+          </label>
+        </li>
+        <li class="question__option question__option--ethnicity">
+          <label class="question__option-label">
+            <input type="radio" name="ethnicity" class="question__checkbox" id="question__checkbox--southasian" value="w">
+            <img src="img/thumbnails/southasian.jpg" alt="South-Asian">
+          </label>
+        </li>
+      </ul>
+      <button class="btn btn--start" id="ethnicity-btn" disabled>Start</button>
+    </div>
+    <div id="video-container"></div>
+  </div>
+  <script src="js/index.js"></script>
+</body>
+</html>
