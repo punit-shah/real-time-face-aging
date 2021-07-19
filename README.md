@@ -4,6 +4,8 @@ Face aging in real time on the web.
 
 👦 ➡️ 👴
 
+Final year university project.
+
 The application source code can be found in the `src` directory.
 
 ## Dependencies
@@ -33,11 +35,11 @@ Visit `http://localhost:8080` from your browser to view the application.
 
 ## Deploying the application
 
-To deploy the application to GitHub Pages, run:
+To deploy the application to Surge, run:
 
 ```
 yarn deploy
 ```
 
 This will build the application for production to the `build` directory, and then publish it
-to `https://punit-shah.github.io/real-time-face-aging/`.
+to `https://real-time-face-aging.surge.sh`.
