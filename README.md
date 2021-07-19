@@ -10,34 +10,37 @@ The application source code can be found in the `src` directory.
 
 ## Dependencies
 
-You will need to have Node.js and Yarn installed on your computer.
-You can download them from:
+You will need to have Node.js v10 and Yarn installed to run this application.
 
-- https://nodejs.org/en/
-- https://yarnpkg.com/lang/en/
+The following assumes you use [nvm](https://github.com/nvm-sh/nvm) to manage Node.js versions. If not, skip the first command, but make sure Node.js v10 is installed.
 
-To install the project dependencies, navigate to this directory from the command line, and run:
+```sh
+# install Node.js v10
+nvm install
 
-```
-yarn install
+# install Yarn
+npm i -g yarn
+
+# install project dependencies
+yarn
 ```
 
 ## Running the application
 
 To start the development server, run:
 
-```
+```sh
 yarn start
 ```
 
 When your terminal says `webpack: Compiled successfully.`, the application has finished building.
-Visit `http://localhost:8080` from your browser to view the application.
+Visit http://localhost:8080 from your browser to view the application.
 
 ## Deploying the application
 
 To deploy the application to Surge, run:
 
-```
+```sh
 yarn deploy
 ```
 
