@@ -104,7 +104,7 @@ class App {
   drawMask() {
     // copy video frame to canvas
     this.videoframeContext.drawImage(this.faceTracker.video, 0, 0,
-        this.videoframeCanvas.width, this.videoframeCanvas.height);
+      this.videoframeCanvas.width, this.videoframeCanvas.height);
 
     const subjectPositions = this.faceTracker.tracker.getCurrentPosition();
     if (subjectPositions) {
